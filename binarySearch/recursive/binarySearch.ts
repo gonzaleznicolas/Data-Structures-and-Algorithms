@@ -24,6 +24,6 @@ function bsHelper(ary: number[], value: number, startIndex: number, endIndex: nu
     } else if (value < ary[midIndex]) {
         return bsHelper(ary, value, startIndex, midIndex);
     } else { // ary[midIndex] < value
-        return bsHelper(ary, value, midIndex, endIndex)
+        return bsHelper(ary, value, midIndex + 1, endIndex)
     }
 }
