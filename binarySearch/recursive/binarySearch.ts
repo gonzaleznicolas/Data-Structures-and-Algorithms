@@ -1,5 +1,5 @@
 let sortedArray = [1,2,3,4,5];
-let valueToFind = 4;
+let valueToFind = 6;
 let index = binarySearch(sortedArray, valueToFind);
 console.log(`In the array ${sortedArray} the index of the value ${valueToFind} is ${index}`);
 
