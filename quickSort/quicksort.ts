@@ -1,4 +1,4 @@
-let array = [3, 2, 1, 0];
+let array = [4, 9, 5, 0, 2, 90, 89, 2, 45];
 console.log(partition(array, 0, array.length - 1));
 console.log(array.join(','));
 
@@ -8,11 +8,11 @@ function partition(ary: number[], low: number, high: number): number {
     let j = high - 1;
 
     while (i < j) {
-        while (ary[i] <= p && i < high) {
+        while (ary[i] <= p && i <= j) {
             i++;
         }
 
-        while (ary[j] >= p && j >= i && j > low) {
+        while (ary[j] >= p && j >= i) {
             j--;
         }
 
