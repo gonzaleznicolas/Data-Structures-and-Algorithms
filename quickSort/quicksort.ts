@@ -1,6 +1,20 @@
 let array = [4, 9, 5, 0, 2, 90, 89, 2, 45];
-console.log(partition(array, 0, array.length - 1));
+quickSort(array);
 console.log(array.join(','));
+
+function quickSort(ary: number[]) {
+    quickSortHelper(ary, 0, ary.length - 1);
+}
+
+function quickSortHelper(ary: number[], low: number, high: number) {
+    if (low >= high) {
+        return;
+    }
+    
+    let q = partition(ary, low, high); // index of element placed in its final position
+    quickSortHelper(ary, low, q - 1);
+    quickSortHelper(ary, q + 1, high);
+}
 
 function partition(ary: number[], low: number, high: number): number {
     let p = ary[high]; // pivot
