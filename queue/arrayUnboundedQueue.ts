@@ -5,7 +5,7 @@ class ArrayUnboundedQueue {
     count: number; // count
 
     constructor() {
-        this.ary = new Array<number>(4);
+        this.ary = new Array<number>(2);
         this.head = 0;
         this.tail = 0;
         this.count = 0;
@@ -41,26 +41,38 @@ class ArrayUnboundedQueue {
     }
 
     add(n: number) {
-        console.log(`\nadd(${n})`);
         if (!this.isFull) {
+            console.log(`\nadd(${n})`);
             this.count++;
             this.ary[this.tail] = n;
             this.tail = this.nextIndex(this.tail);
+            this.print();
+        } else {
+            let temp = new Array<number>(this.capacity * 2);
+            for (let i = 0; i < this.count; i++) {
+                temp[i] = this.ary[this.indexPlusOffset(this.head, i)];
+            }
+            this.ary = temp;
+            this.head = 0;
+            this.tail = this.count;
+            this.add(n);
         }
-        this.print();
     }
 
-    remove(): number {
+    remove(): number | void {
         console.log(`\nremove()`);
         let n: number;
         if (!this.isEmpty) {
             this.count--;
             n = this.ary[this.head];
             this.head = this.nextIndex(this.head);
+            this.print();
+            console.log(`return ${n}`);
+            return n;
+        } else {
+            console.log("The queue is empty. Cannot remove.");
+            this.print();
         }
-        this.print();
-        console.log(`return ${n}`);
-        return n;
     }
 }
 
@@ -70,6 +82,17 @@ q.add(2);
 q.add(3);
 q.add(4);
 q.add(5);
+q.add(6);
+q.add(7);
+q.add(8);
+q.add(9);
+q.add(10);
+q.remove();
+q.remove();
+q.remove();
+q.remove();
+q.remove();
+q.remove();
 q.remove();
 q.remove();
 q.remove();
