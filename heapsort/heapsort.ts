@@ -90,26 +90,34 @@ class HeapSort {
             let leftChildVal = this.left(i) < this.size ? this.ary[this.left(i)] : undefined;
             let rightChildVal = this.right(i) < this.size ? this.ary[this.right(i)] : undefined;
 
-            if (leftChildVal === undefined && rightChildVal === undefined) {
+            if (leftChildVal === undefined && rightChildVal === undefined) { // no children
                 break;
             }
-            else if (leftChildVal !== undefined && rightChildVal === undefined && leftChildVal > numToMoveDown) {
-                // swap with left
-                this.ary[i] = this.ary[this.left(i)];
-                this.ary[this.left(i)] = numToMoveDown;
-                i = this.left(i);
-            } else if (leftChildVal !== undefined && rightChildVal !== undefined) {
-                if (leftChildVal >= rightChildVal) {
+            else if (leftChildVal !== undefined && rightChildVal === undefined) { // one child
+                if (leftChildVal > numToMoveDown) {
+                    // swap with left
+                    this.ary[i] = this.ary[this.left(i)];
+                    this.ary[this.left(i)] = numToMoveDown;
+                    i = this.left(i);
+                } else {
+                    break;
+                }
+            } else if (leftChildVal !== undefined && rightChildVal !== undefined) { // two children
+                if (leftChildVal > rightChildVal) {
                     // swap with left
                     this.ary[i] = leftChildVal;
                     this.ary[this.left(i)] = numToMoveDown;
                     i = this.left(i);
-                } else {
+                } else if (rightChildVal > leftChildVal) {
                     // swap with right
                     this.ary[i] = rightChildVal;
                     this.ary[this.right(i)] = numToMoveDown;
                     i = this.right(i);
+                } else {
+                    break;
                 }
+            } else {
+                break;
             }
         }
 
@@ -119,6 +127,6 @@ class HeapSort {
     }
 }
 
-let a = [5, 2, 9, 4, 7, 1];
+let a = [9, 8, 7, 6, 5, 4, 3, 1];
 new HeapSort(a);
 console.log(a.join(", "));
