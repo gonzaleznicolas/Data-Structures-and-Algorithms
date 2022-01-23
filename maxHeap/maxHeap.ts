@@ -1,4 +1,4 @@
-class HeapSort {
+class MaxHeap {
     ary: number[];
     size: number;
 
@@ -95,7 +95,7 @@ class HeapSort {
     }
 }
 
-let mH = new HeapSort(7);
+let mH = new MaxHeap(7);
 mH.insert(5);
 mH.insert(4);
 mH.insert(8);
