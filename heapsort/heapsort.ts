@@ -2,9 +2,20 @@ class HeapSort {
     ary: number[];
     size: number;
 
-    constructor(capacity: number) {
-        this.ary = new Array<number>(capacity);
+    constructor(arrayToSort: number[]) {
+        this.ary = arrayToSort;
         this.size = 0;
+        this.sort();
+    }
+
+    sort() {
+        for (let i = 0; i < this.ary.length; i++) {
+            this.insert(this.ary[i]);
+        }
+
+        for (let i = this.ary.length - 1; i >= 0; i--) {
+            this.ary[i] = this.deleteMax();
+        }
     }
 
     get isFull() {
@@ -75,17 +86,30 @@ class HeapSort {
 
         let i = 0;
         let numToMoveDown = this.ary[i];
-        while (this.ary[i] < this.ary[this.left(i)] || this.ary[i] < this.ary[this.right[i]]) {
-            if (this.ary[this.left(i)] >= this.ary[this.right(i)]) {
-                // left child is >=. Swap with left
+        while (i < this.size) {
+            let leftChildVal = this.left(i) < this.size ? this.ary[this.left(i)] : undefined;
+            let rightChildVal = this.right(i) < this.size ? this.ary[this.right(i)] : undefined;
+
+            if (leftChildVal === undefined && rightChildVal === undefined) {
+                break;
+            }
+            else if (leftChildVal !== undefined && rightChildVal === undefined && leftChildVal > numToMoveDown) {
+                // swap with left
                 this.ary[i] = this.ary[this.left(i)];
                 this.ary[this.left(i)] = numToMoveDown;
                 i = this.left(i);
-            } else {
-                // right child is >. Swap with right
-                this.ary[i] = this.ary[this.right(i)];
-                this.ary[this.right(i)] = numToMoveDown;
-                i = this.right(i);
+            } else if (leftChildVal !== undefined && rightChildVal !== undefined) {
+                if (leftChildVal >= rightChildVal) {
+                    // swap with left
+                    this.ary[i] = leftChildVal;
+                    this.ary[this.left(i)] = numToMoveDown;
+                    i = this.left(i);
+                } else {
+                    // swap with right
+                    this.ary[i] = rightChildVal;
+                    this.ary[this.right(i)] = numToMoveDown;
+                    i = this.right(i);
+                }
             }
         }
 
@@ -95,19 +119,6 @@ class HeapSort {
     }
 }
 
-let mH = new HeapSort(7);
-mH.insert(5);
-mH.insert(4);
-mH.insert(8);
-mH.insert(1);
-mH.insert(10);
-mH.insert(0);
-mH.insert(12);
-mH.deleteMax();
-mH.deleteMax();
-mH.deleteMax();
-mH.deleteMax();
-mH.deleteMax();
-mH.deleteMax();
-mH.deleteMax();
-mH.deleteMax();
+let a = [5, 2, 9, 4, 7, 1];
+new HeapSort(a);
+console.log(a.join(", "));
