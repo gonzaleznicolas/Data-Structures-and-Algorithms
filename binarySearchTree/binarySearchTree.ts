@@ -25,6 +25,18 @@ class BstNode {
         return !this.hasLeft && !this.hasRight;
     }
 
+    get hasOnlyOneChild() {
+        return (this.hasLeft && !this.hasRight) || (!this.hasLeft && this.hasRight);
+    }
+
+    get onlyChild(): BstNode {
+        if (this.hasOnlyOneChild) {
+            return this.hasLeft ? this.left : this.right;
+        } else {
+            throw Error("Cannot call onlyChild on node with two children");
+        }
+    }
+
     removeChildWithKey(k: number) {
         if (this.hasRight && this.right.key === k) {
             this.right = undefined;
@@ -104,17 +116,12 @@ class BinarySearchTree {
         let d = this.search(deleteKey);
         if (d.isLeaf) {
             d.parent.removeChildWithKey(deleteKey);
-        } else if (d.hasLeft && !d.hasRight) {
+        } else if (d.hasOnlyOneChild) {
+            d.onlyChild.parent = d.parent;
             if (d.parent.left.key === d.key) {
-                d.parent.left = d.left;
+                d.parent.left = d.onlyChild;
             } else {
-                d.parent.right = d.left;
-            }
-        } else if (!d.hasLeft && d.hasRight) {
-            if (d.parent.left.key === d.key) {
-                d.parent.left = d.right;
-            } else {
-                d.parent.right = d.right;
+                d.parent.right = d.onlyChild;
             }
         }
     }
