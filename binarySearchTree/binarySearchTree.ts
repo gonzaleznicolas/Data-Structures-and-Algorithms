@@ -50,6 +50,23 @@ class BinarySearchTree {
             }
         }
     }
+
+    search(searchKey: number) {
+        let pointer = this.root;
+        while(pointer !== undefined) {
+            if (searchKey === pointer.key) {
+                break;
+            } else if (searchKey < pointer.key) {
+                pointer = pointer.left;
+            } else { // searchKey > pointer.key
+                pointer = pointer.right;
+            }
+        }
+        if (pointer === undefined) {
+            throw Error("Not found.");
+        }
+        return pointer.value;
+    }
 }
 
 let bst = new BinarySearchTree();
@@ -59,3 +76,9 @@ bst.insert(2,2);
 bst.insert(6,6);
 bst.insert(7,7);
 bst.insert(0,0);
+console.log(bst.search(5));
+console.log(bst.search(4));
+console.log(bst.search(2));
+console.log(bst.search(6));
+console.log(bst.search(7));
+console.log(bst.search(0));
