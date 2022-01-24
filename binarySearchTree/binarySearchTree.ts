@@ -67,6 +67,15 @@ class BinarySearchTree {
         }
         return pointer.value;
     }
+
+    // returns the min BstNode in the tree rooted at node
+    findMin(node: BstNode) {
+        let pointer = node;
+        while (pointer.left !== undefined) {
+            pointer = pointer.left;
+        }
+        return pointer;
+    }
 }
 
 let bst = new BinarySearchTree();
@@ -82,3 +91,4 @@ console.log(bst.search(2));
 console.log(bst.search(6));
 console.log(bst.search(7));
 console.log(bst.search(0));
+bst.findMin(bst.root);
