@@ -12,6 +12,28 @@ class BstNode {
         this.right = undefined;
         this.parent = p;
     }
+
+    get hasLeft() {
+        return this.left !== undefined;
+    }
+
+    get hasRight() {
+        return this.right !== undefined;
+    }
+
+    get isLeaf() {
+        return !this.hasLeft && !this.hasRight;
+    }
+
+    removeChildWithKey(k: number) {
+        if (this.hasRight && this.right.key === k) {
+            this.right = undefined;
+        } else if (this.hasLeft && this.left.key === k) {
+            this.left = undefined;
+        } else {
+            throw Error("Neither child has that key.");
+        }
+    }
 }
 
 class BinarySearchTree {
@@ -72,10 +94,29 @@ class BinarySearchTree {
     // returns the min BstNode in the tree rooted at node
     findMin(node: BstNode): BstNode {
         let pointer = node;
-        while (pointer.left !== undefined) {
+        while (pointer.hasLeft) {
             pointer = pointer.left;
         }
         return pointer;
+    }
+
+    delete(deleteKey: number) {
+        let d = this.search(deleteKey);
+        if (d.isLeaf) {
+            d.parent.removeChildWithKey(deleteKey);
+        } else if (d.hasLeft && !d.hasRight) {
+            if (d.parent.left.key === d.key) {
+                d.parent.left = d.left;
+            } else {
+                d.parent.right = d.left;
+            }
+        } else if (!d.hasLeft && d.hasRight) {
+            if (d.parent.left.key === d.key) {
+                d.parent.left = d.right;
+            } else {
+                d.parent.right = d.right;
+            }
+        }
     }
 }
 
@@ -93,3 +134,5 @@ console.log(bst.search(6).value);
 console.log(bst.search(7).value);
 console.log(bst.search(0).value);
 console.log(bst.findMin(bst.root).value);
+bst.delete(4);
+console.log("hi");
