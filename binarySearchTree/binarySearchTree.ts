@@ -39,8 +39,10 @@ class BstNode {
 
     removeChildWithKey(k: number) {
         if (this.hasRight && this.right.key === k) {
+            this.right.parent = undefined;
             this.right = undefined;
         } else if (this.hasLeft && this.left.key === k) {
+            this.left.parent = undefined;
             this.left = undefined;
         } else {
             throw Error("Neither child has that key.");
@@ -123,23 +125,39 @@ class BinarySearchTree {
             } else {
                 d.parent.right = d.onlyChild;
             }
+        } else { // has two children
+            let minInRightSubTree = this.findMin(d.right);
+            minInRightSubTree.parent.removeChildWithKey(minInRightSubTree.key)
+            if (d.parent.left.key === d.key) {
+                d.parent.left = minInRightSubTree;
+            } else { // d.parent.right.key === d.key
+                d.parent.right = minInRightSubTree;
+            }
+            minInRightSubTree.parent = d.parent;
+            d.parent = undefined;
+
+            d.left.parent = minInRightSubTree;
+            minInRightSubTree.left = d.left;
+            d.left = undefined;
+
+            d.right.parent = minInRightSubTree;
+            minInRightSubTree.right = d.right;
+            d.right = undefined;
         }
     }
 }
 
 let bst = new BinarySearchTree();
-bst.insert(5,5);
-bst.insert(4,4);
-bst.insert(2,2);
-bst.insert(6,6);
-bst.insert(7,7);
-bst.insert(0,0);
-console.log(bst.search(5).value);
-console.log(bst.search(4).value);
-console.log(bst.search(2).value);
-console.log(bst.search(6).value);
-console.log(bst.search(7).value);
-console.log(bst.search(0).value);
-console.log(bst.findMin(bst.root).value);
-bst.delete(4);
+bst.insert(50,50);
+bst.insert(30,30);
+bst.insert(70,70);
+bst.insert(10,10);
+bst.insert(40,40);
+bst.insert(60,60);
+bst.insert(80,80);
+bst.insert(33,33);
+bst.insert(45,45);
+bst.delete(80);
+bst.delete(70);
+bst.delete(30);
 console.log("hi");
