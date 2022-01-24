@@ -3,12 +3,14 @@ class BstNode {
     value: number
     left: BstNode;
     right: BstNode;
+    parent: BstNode;
 
-    constructor(k: number, v: number) {
+    constructor(k: number, v: number, p: BstNode = undefined) {
         this.key = k;
         this.value = v;
         this.left = undefined;
         this.right = undefined;
+        this.parent = p;
     }
 }
 
@@ -23,25 +25,24 @@ class BinarySearchTree {
         return this.root === undefined;
     }
 
-    insert(k: number, v: number) {
-        let newNode = new BstNode(k, v);
+    insert(newKey: number, newVal: number): void {
         if (this.isEmpty) {
-            this.root = newNode;
+            this.root = new BstNode(newKey, newVal, undefined);
         } else {
             let pointer = this.root;
             while(true) {
-                if (newNode.key === pointer.key) {
+                if (newKey === pointer.key) {
                     throw Error("Key already exists");
-                } else if (newNode.key < pointer.key) {
+                } else if (newKey < pointer.key) {
                     if (pointer.left === undefined) {
-                        pointer.left = newNode;
+                        pointer.left = new BstNode(newKey, newVal, pointer);
                         break;
                     } else {
                         pointer = pointer.left;
                     }
                 } else { // newNode.key > pointer.key
                     if (pointer.right === undefined) {
-                        pointer.right = newNode;
+                        pointer.right = new BstNode(newKey, newVal, pointer);
                         break;
                     } else {
                         pointer = pointer.right;
@@ -51,7 +52,7 @@ class BinarySearchTree {
         }
     }
 
-    search(searchKey: number) {
+    search(searchKey: number): BstNode {
         let pointer = this.root;
         while(pointer !== undefined) {
             if (searchKey === pointer.key) {
@@ -65,11 +66,11 @@ class BinarySearchTree {
         if (pointer === undefined) {
             throw Error("Not found.");
         }
-        return pointer.value;
+        return pointer;
     }
 
     // returns the min BstNode in the tree rooted at node
-    findMin(node: BstNode) {
+    findMin(node: BstNode): BstNode {
         let pointer = node;
         while (pointer.left !== undefined) {
             pointer = pointer.left;
@@ -85,10 +86,10 @@ bst.insert(2,2);
 bst.insert(6,6);
 bst.insert(7,7);
 bst.insert(0,0);
-console.log(bst.search(5));
-console.log(bst.search(4));
-console.log(bst.search(2));
-console.log(bst.search(6));
-console.log(bst.search(7));
-console.log(bst.search(0));
-bst.findMin(bst.root);
+console.log(bst.search(5).value);
+console.log(bst.search(4).value);
+console.log(bst.search(2).value);
+console.log(bst.search(6).value);
+console.log(bst.search(7).value);
+console.log(bst.search(0).value);
+console.log(bst.findMin(bst.root).value);
