@@ -1,16 +1,28 @@
-class BstNode {
+class AvlNode {
     key: number;
     value: number
-    left: BstNode;
-    right: BstNode;
-    parent: BstNode;
+    height: number;
+    left: AvlNode;
+    right: AvlNode;
+    parent: AvlNode;
 
-    constructor(k: number, v: number, p: BstNode = undefined) {
+    constructor(k: number, v: number, p: AvlNode = undefined, h: number) {
         this.key = k;
         this.value = v;
         this.left = undefined;
         this.right = undefined;
         this.parent = p;
+        this.height = h;
+    }
+
+    updateHeightBasedOnChildren() {
+        if (this.hasOnlyOneChild) {
+            this.height = this.onlyChild.height + 1;
+        } else if (this.isLeaf) {
+            this.height = 0;
+        } else { // has two children
+            this.height = Math.max(this.left.height, this.right.height) + 1;
+        }
     }
 
     get hasLeft() {
@@ -29,7 +41,7 @@ class BstNode {
         return (this.hasLeft && !this.hasRight) || (!this.hasLeft && this.hasRight);
     }
 
-    get onlyChild(): BstNode {
+    get onlyChild(): AvlNode {
         if (this.hasOnlyOneChild) {
             return this.hasLeft ? this.left : this.right;
         } else {
@@ -51,7 +63,7 @@ class BstNode {
 }
 
 class AvlTree {
-    root: BstNode;
+    root: AvlNode;
 
     constructor() {
         this.root = undefined;
@@ -63,32 +75,39 @@ class AvlTree {
 
     insert(newKey: number, newVal: number): void {
         if (this.isEmpty) {
-            this.root = new BstNode(newKey, newVal, undefined);
+            this.root = new AvlNode(newKey, newVal, undefined, 0);
         } else {
             let pointer = this.root;
-            while(true) {
+            while (true) {
                 if (newKey === pointer.key) {
                     throw Error("Key already exists");
                 } else if (newKey < pointer.key) {
                     if (pointer.left === undefined) {
-                        pointer.left = new BstNode(newKey, newVal, pointer);
+                        pointer.left = new AvlNode(newKey, newVal, pointer, 0);
+                        pointer = pointer.left;
                         break;
                     } else {
                         pointer = pointer.left;
                     }
                 } else { // newNode.key > pointer.key
                     if (pointer.right === undefined) {
-                        pointer.right = new BstNode(newKey, newVal, pointer);
+                        pointer.right = new AvlNode(newKey, newVal, pointer, 0);
+                        pointer = pointer.right;
                         break;
                     } else {
                         pointer = pointer.right;
                     }
                 }
             }
+
+            while (pointer !== undefined) {
+                pointer.updateHeightBasedOnChildren();
+                pointer = pointer.parent;
+            }
         }
     }
 
-    search(searchKey: number): BstNode {
+    search(searchKey: number): AvlNode {
         let pointer = this.root;
         while(pointer !== undefined) {
             if (searchKey === pointer.key) {
@@ -106,7 +125,7 @@ class AvlTree {
     }
 
     // returns the min BstNode in the tree rooted at node
-    findMin(node: BstNode): BstNode {
+    findMin(node: AvlNode): AvlNode {
         let pointer = node;
         while (pointer.hasLeft) {
             pointer = pointer.left;
@@ -115,20 +134,27 @@ class AvlTree {
     }
 
     delete(deleteKey: number) {
+        // if the deleted node is not a leaf, it is replaced with a leaf
+        // Whatever leaf is no longer there, that is the "deletedNode"
+        let lowestNodeOnPathFromDeletedNodeToRoot: AvlNode;
+
         let d = this.search(deleteKey);
         if (d.isLeaf) {
+            lowestNodeOnPathFromDeletedNodeToRoot = d.parent;
             d.parent.removeChildWithKey(deleteKey);
         } else if (d.hasOnlyOneChild) {
+            lowestNodeOnPathFromDeletedNodeToRoot = d.onlyChild;
             d.onlyChild.parent = d.parent;
-            if (d.parent.left.key === d.key) {
+            if (d.parent.hasLeft && d.parent.left.key === d.key) {
                 d.parent.left = d.onlyChild;
             } else {
                 d.parent.right = d.onlyChild;
             }
         } else { // has two children
             let minInRightSubTree = this.findMin(d.right);
+            lowestNodeOnPathFromDeletedNodeToRoot = minInRightSubTree.parent;
             minInRightSubTree.parent.removeChildWithKey(minInRightSubTree.key)
-            if (d.parent.left.key === d.key) {
+            if (d.parent.hasLeft && d.parent.left.key === d.key) {
                 d.parent.left = minInRightSubTree;
             } else { // d.parent.right.key === d.key
                 d.parent.right = minInRightSubTree;
@@ -144,20 +170,26 @@ class AvlTree {
             minInRightSubTree.right = d.right;
             d.right = undefined;
         }
+
+        let pointer = lowestNodeOnPathFromDeletedNodeToRoot;
+        while (pointer !== undefined) {
+            pointer.updateHeightBasedOnChildren();
+            pointer = pointer.parent;
+        }
     }
 }
 
-let bst = new AvlTree();
-bst.insert(50,50);
-bst.insert(30,30);
-bst.insert(70,70);
-bst.insert(10,10);
-bst.insert(40,40);
-bst.insert(60,60);
-bst.insert(80,80);
-bst.insert(33,33);
-bst.insert(45,45);
-bst.delete(80);
-bst.delete(70);
-bst.delete(30);
+let avlt = new AvlTree();
+avlt.insert(50,50);
+avlt.insert(30,30);
+avlt.insert(70,70);
+avlt.insert(10,10);
+avlt.insert(40,40);
+avlt.insert(60,60);
+avlt.insert(80,80);
+avlt.insert(33,33);
+avlt.insert(45,45);
+avlt.delete(80);
+avlt.delete(70);
+avlt.delete(30);
 console.log("hi");
