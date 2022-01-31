@@ -15,6 +15,23 @@ class AvlNode {
         this.height = h;
     }
 
+    // returns the root of the tree after the rotation
+    rightRotate(): AvlNode {
+        this.left.parent = this.parent;
+        if (this.hasParent && this.parent.hasLeft && this.parent.left.key === this.key) {
+            this.parent.left = this.left;
+        } else if (this.hasParent) {
+            this.parent.right = this.left;
+        }
+        this.parent = this.left;
+        this.left = this.parent.right;
+        if (this.parent.hasRight) {
+            this.parent.right.parent = this;
+        }
+        this.parent.right = this;
+        return this.parent;
+    }
+
     updateHeightBasedOnChildren() {
         if (this.hasOnlyOneChild) {
             this.height = this.onlyChild.height + 1;
@@ -25,12 +42,48 @@ class AvlNode {
         }
     }
 
+    removeChildWithKey(k: number) {
+        if (this.hasRight && this.right.key === k) {
+            this.right.parent = undefined;
+            this.right = undefined;
+        } else if (this.hasLeft && this.left.key === k) {
+            this.left.parent = undefined;
+            this.left = undefined;
+        } else {
+            throw Error("Neither child has that key.");
+        }
+    }
+
+    get hasParent() {
+        return this.parent !== undefined;
+    }
+
+    get balanceFactor() {
+        return this.leftHeight - this.rightHeight;
+    }
+
     get hasLeft() {
         return this.left !== undefined;
     }
 
+    get leftHeight() {
+        if (this.hasLeft) {
+            return this.left.height;
+        } else {
+            return -1;
+        }
+    }
+
     get hasRight() {
         return this.right !== undefined;
+    }
+
+    get rightHeight() {
+        if (this.hasRight) {
+            return this.right.height;
+        } else {
+            return -1;
+        }
     }
 
     get isLeaf() {
@@ -46,18 +99,6 @@ class AvlNode {
             return this.hasLeft ? this.left : this.right;
         } else {
             throw Error("Cannot call onlyChild on node with two children");
-        }
-    }
-
-    removeChildWithKey(k: number) {
-        if (this.hasRight && this.right.key === k) {
-            this.right.parent = undefined;
-            this.right = undefined;
-        } else if (this.hasLeft && this.left.key === k) {
-            this.left.parent = undefined;
-            this.left = undefined;
-        } else {
-            throw Error("Neither child has that key.");
         }
     }
 }
@@ -102,6 +143,20 @@ class AvlTree {
 
             while (pointer !== undefined) {
                 pointer.updateHeightBasedOnChildren();
+                if (pointer.balanceFactor > 1) { // node was inserted in left subtree
+                    if (pointer.left.leftHeight >= pointer.left.rightHeight) { // left outer case
+                        // perform a right rotation on pointer
+                        let r = pointer.rightRotate();
+                        if (!r.hasParent) {
+                            this.root = r;
+                        }
+                        break; // for insertion, after a rotation is performed, there is no need to continue walking up the tree
+                    } else { // left inner case
+
+                    }
+                } else if (pointer.balanceFactor < -1) {
+
+                }
                 pointer = pointer.parent;
             }
         }
@@ -179,15 +234,6 @@ class AvlTree {
 
 let avlt = new AvlTree();
 avlt.insert(50,50);
-avlt.insert(30,30);
-avlt.insert(70,70);
-avlt.insert(10,10);
 avlt.insert(40,40);
-avlt.insert(60,60);
-avlt.insert(80,80);
-avlt.insert(33,33);
-avlt.insert(45,45);
-avlt.delete(80);
-avlt.delete(70);
-avlt.delete(30);
+avlt.insert(30,30);
 console.log("hi");
