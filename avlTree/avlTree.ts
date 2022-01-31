@@ -32,6 +32,23 @@ class AvlNode {
         return this.parent;
     }
 
+        // returns the root of the tree after the rotation
+        leftRotate(): AvlNode {
+            this.right.parent = this.parent;
+            if (this.hasParent && this.parent.hasLeft && this.parent.left.key === this.key) {
+                this.parent.left = this.right;
+            } else if (this.hasParent) {
+                this.parent.right = this.right;
+            }
+            this.parent = this.right;
+            this.right = this.parent.left;
+            if (this.parent.hasLeft) {
+                this.parent.left.parent = this;
+            }
+            this.parent.left = this;
+            return this.parent;
+        }
+
     updateHeightBasedOnChildren() {
         if (this.hasOnlyOneChild) {
             this.height = this.onlyChild.height + 1;
@@ -154,7 +171,16 @@ class AvlTree {
                     } else { // left inner case
 
                     }
-                } else if (pointer.balanceFactor < -1) {
+                } else if (pointer.balanceFactor < -1) { // node was inserted in the right subtree
+                    if (pointer.right.rightHeight >= pointer.right.leftHeight) { // right outer case
+                        let r = pointer.leftRotate();
+                        if (!r.hasParent) {
+                            this.root = r;
+                        }
+                        break;
+                    } else { // right inner case
+
+                    }
 
                 }
                 pointer = pointer.parent;
@@ -234,6 +260,6 @@ class AvlTree {
 
 let avlt = new AvlTree();
 avlt.insert(50,50);
-avlt.insert(40,40);
-avlt.insert(30,30);
+avlt.insert(80,80);
+avlt.insert(90,90);
 console.log("hi");
