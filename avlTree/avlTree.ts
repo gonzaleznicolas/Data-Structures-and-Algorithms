@@ -16,6 +16,12 @@ class AvlNode {
     }
 
     // returns the root of the tree after the rotation
+    rightLeftDoubleRotate(): AvlNode {
+        this.right.rightRotate();
+        return this.leftRotate();
+    }
+
+    // returns the root of the tree after the rotation
     leftRightDoubleRotate(): AvlNode {
         this.left.leftRotate();
         return this.rightRotate();
@@ -40,24 +46,24 @@ class AvlNode {
         return this.parent;
     }
 
-        // returns the root of the tree after the rotation
-        leftRotate(): AvlNode {
-            this.right.parent = this.parent;
-            if (this.hasParent && this.parent.hasLeft && this.parent.left.key === this.key) {
-                this.parent.left = this.right;
-            } else if (this.hasParent) {
-                this.parent.right = this.right;
-            }
-            this.parent = this.right;
-            this.right = this.parent.left;
-            if (this.parent.hasLeft) {
-                this.parent.left.parent = this;
-            }
-            this.parent.left = this;
-            this.updateHeightBasedOnChildren();
-            this.parent.updateHeightBasedOnChildren();
-            return this.parent;
+    // returns the root of the tree after the rotation
+    leftRotate(): AvlNode {
+        this.right.parent = this.parent;
+        if (this.hasParent && this.parent.hasLeft && this.parent.left.key === this.key) {
+            this.parent.left = this.right;
+        } else if (this.hasParent) {
+            this.parent.right = this.right;
         }
+        this.parent = this.right;
+        this.right = this.parent.left;
+        if (this.parent.hasLeft) {
+            this.parent.left.parent = this;
+        }
+        this.parent.left = this;
+        this.updateHeightBasedOnChildren();
+        this.parent.updateHeightBasedOnChildren();
+        return this.parent;
+    }
 
     updateHeightBasedOnChildren() {
         if (this.hasOnlyOneChild) {
@@ -172,19 +178,17 @@ class AvlTree {
                 pointer.updateHeightBasedOnChildren();
                 if (pointer.balanceFactor > 1) { // node was inserted in left subtree
                     if (pointer.left.leftHeight >= pointer.left.rightHeight) { // left outer case
-                        // perform a right rotation on pointer
                         let r = pointer.rightRotate();
                         if (!r.hasParent) {
                             this.root = r;
                         }
                         break; // for insertion, after a rotation is performed, there is no need to continue walking up the tree
                     } else { // left inner case
-                        // perform a left right double rotation on pointer
                         let r = pointer.leftRightDoubleRotate();
                         if (!r.hasParent) {
                             this.root = r;
                         }
-                        break; // for insertion, after a rotation is performed, there is no need to continue walking up the tree
+                        break;
                     }
                 } else if (pointer.balanceFactor < -1) { // node was inserted in the right subtree
                     if (pointer.right.rightHeight >= pointer.right.leftHeight) { // right outer case
@@ -194,9 +198,12 @@ class AvlTree {
                         }
                         break;
                     } else { // right inner case
-
+                        let r = pointer.rightLeftDoubleRotate();
+                        if (!r.hasParent) {
+                            this.root = r;
+                        }
+                        break;
                     }
-
                 }
                 pointer = pointer.parent;
             }
@@ -277,7 +284,7 @@ let avlt = new AvlTree();
 avlt.insert(50,50);
 avlt.insert(30,30);
 avlt.insert(90,90);
-avlt.insert(20,20);
-avlt.insert(40,40);
-avlt.insert(33,33);
+avlt.insert(70,70);
+avlt.insert(100,100);
+avlt.insert(75,75);
 console.log("hi");
