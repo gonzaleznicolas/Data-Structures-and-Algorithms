@@ -16,6 +16,12 @@ class AvlNode {
     }
 
     // returns the root of the tree after the rotation
+    leftRightDoubleRotate(): AvlNode {
+        this.left.leftRotate();
+        return this.rightRotate();
+    }
+
+    // returns the root of the tree after the rotation
     rightRotate(): AvlNode {
         this.left.parent = this.parent;
         if (this.hasParent && this.parent.hasLeft && this.parent.left.key === this.key) {
@@ -29,6 +35,8 @@ class AvlNode {
             this.parent.right.parent = this;
         }
         this.parent.right = this;
+        this.updateHeightBasedOnChildren();
+        this.parent.updateHeightBasedOnChildren();
         return this.parent;
     }
 
@@ -46,6 +54,8 @@ class AvlNode {
                 this.parent.left.parent = this;
             }
             this.parent.left = this;
+            this.updateHeightBasedOnChildren();
+            this.parent.updateHeightBasedOnChildren();
             return this.parent;
         }
 
@@ -169,7 +179,12 @@ class AvlTree {
                         }
                         break; // for insertion, after a rotation is performed, there is no need to continue walking up the tree
                     } else { // left inner case
-
+                        // perform a left right double rotation on pointer
+                        let r = pointer.leftRightDoubleRotate();
+                        if (!r.hasParent) {
+                            this.root = r;
+                        }
+                        break; // for insertion, after a rotation is performed, there is no need to continue walking up the tree
                     }
                 } else if (pointer.balanceFactor < -1) { // node was inserted in the right subtree
                     if (pointer.right.rightHeight >= pointer.right.leftHeight) { // right outer case
@@ -260,6 +275,9 @@ class AvlTree {
 
 let avlt = new AvlTree();
 avlt.insert(50,50);
-avlt.insert(80,80);
+avlt.insert(30,30);
 avlt.insert(90,90);
+avlt.insert(20,20);
+avlt.insert(40,40);
+avlt.insert(33,33);
 console.log("hi");
