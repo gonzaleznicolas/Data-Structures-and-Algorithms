@@ -134,8 +134,6 @@ class AvlTree {
     }
 
     delete(deleteKey: number) {
-        // if the deleted node is not a leaf, it is replaced with a leaf
-        // Whatever leaf is no longer there, that is the "deletedNode"
         let lowestNodeOnPathFromDeletedNodeToRoot: AvlNode;
 
         let d = this.search(deleteKey);
