@@ -277,28 +277,19 @@ class AvlTree {
             pointer.updateHeightBasedOnChildren();
             if (pointer.balanceFactor > 1) { // node was inserted in left subtree
                 if (pointer.left.leftHeight >= pointer.left.rightHeight) { // left outer case
-                    let r = pointer.rightRotate();
-                    if (!r.hasParent) {
-                        this.root = r;
-                    }
+                    pointer = pointer.rightRotate();
                 } else { // left inner case
-                    let r = pointer.leftRightDoubleRotate();
-                    if (!r.hasParent) {
-                        this.root = r;
-                    }
+                    pointer = pointer.leftRightDoubleRotate();
                 }
             } else if (pointer.balanceFactor < -1) { // node was inserted in the right subtree
                 if (pointer.right.rightHeight >= pointer.right.leftHeight) { // right outer case
-                    let r = pointer.leftRotate();
-                    if (!r.hasParent) {
-                        this.root = r;
-                    }
+                    pointer = pointer.leftRotate();
                 } else { // right inner case
-                    let r = pointer.rightLeftDoubleRotate();
-                    if (!r.hasParent) {
-                        this.root = r;
-                    }
+                    pointer = pointer.rightLeftDoubleRotate();
                 }
+            }
+            if (!pointer.hasParent) {
+                this.root = pointer;
             }
             pointer = pointer.parent;
         }
@@ -306,17 +297,17 @@ class AvlTree {
 }
 
 let avlt = new AvlTree();
-avlt.insert(50,50);
-avlt.insert(30,30);
-avlt.insert(90,90);
 avlt.insert(70,70);
-avlt.insert(100,100);
-avlt.insert(75,75);
+avlt.insert(50,50);
+avlt.insert(90,90);
+avlt.insert(30,30);
 avlt.insert(55,55);
+avlt.insert(75,75);
+avlt.insert(100,100);
 avlt.insert(20,20);
-avlt.insert(40,40);
-avlt.insert(110,110);
+avlt.insert(53, 53);
 avlt.insert(60,60);
-avlt.insert(10,10);
+avlt.insert(110,110);
+avlt.insert(67,67);
 avlt.delete(75)
 console.log("hi");
