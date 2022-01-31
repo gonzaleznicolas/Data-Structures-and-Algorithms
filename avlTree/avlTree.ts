@@ -275,6 +275,31 @@ class AvlTree {
         let pointer = lowestNodeOnPathFromDeletedNodeToRoot;
         while (pointer !== undefined) {
             pointer.updateHeightBasedOnChildren();
+            if (pointer.balanceFactor > 1) { // node was inserted in left subtree
+                if (pointer.left.leftHeight >= pointer.left.rightHeight) { // left outer case
+                    let r = pointer.rightRotate();
+                    if (!r.hasParent) {
+                        this.root = r;
+                    }
+                } else { // left inner case
+                    let r = pointer.leftRightDoubleRotate();
+                    if (!r.hasParent) {
+                        this.root = r;
+                    }
+                }
+            } else if (pointer.balanceFactor < -1) { // node was inserted in the right subtree
+                if (pointer.right.rightHeight >= pointer.right.leftHeight) { // right outer case
+                    let r = pointer.leftRotate();
+                    if (!r.hasParent) {
+                        this.root = r;
+                    }
+                } else { // right inner case
+                    let r = pointer.rightLeftDoubleRotate();
+                    if (!r.hasParent) {
+                        this.root = r;
+                    }
+                }
+            }
             pointer = pointer.parent;
         }
     }
@@ -287,4 +312,11 @@ avlt.insert(90,90);
 avlt.insert(70,70);
 avlt.insert(100,100);
 avlt.insert(75,75);
+avlt.insert(55,55);
+avlt.insert(20,20);
+avlt.insert(40,40);
+avlt.insert(110,110);
+avlt.insert(60,60);
+avlt.insert(10,10);
+avlt.delete(75)
 console.log("hi");
