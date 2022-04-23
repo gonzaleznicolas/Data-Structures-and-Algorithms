@@ -2,29 +2,45 @@
 {
 	public static void Main(String[] args)
 	{
-		var ll = new Dictionary<int, int>.LinkedList();
-		ll.Insert(1, 1);
-		ll.Insert(2, 2);
-		ll.Insert(3, 3);
-		ll.Insert(4, 4);
-		ll.Insert(5, 5);
-		ll.Insert(6, 6);
-		ll.Remove(1);
-		ll.Remove(3);
-		ll.Remove(10);
-		ll.Remove(6);
-		Console.WriteLine(ll.GetByKey(2, out int f));
+		var ll = new Dictionary<string, string>();
+		Console.WriteLine(ll.Insert("1", "1"));
 	}
 }
 
 
 public class Dictionary<TKey, TValue> where TKey : IEquatable<TKey>
 {
+	private LinkedList[] LinkedLists { get; set; }
+
+	public Dictionary(int initialCapacity = 10)
+	{
+		LinkedLists = new LinkedList[initialCapacity];
+		for (int i = 0; i < LinkedLists.Length; i++) LinkedLists[i] = new LinkedList();
+	}
+
+	public bool Insert(TKey key, TValue? value) {
+		var ll = LinkedLists[KeyToIndex(key)];
+		return ll.Insert(key, value);
+	}
+
+	private int KeyToIndex(TKey key) {
+		var hash = key.GetHashCode();
+		var positive = hash & 0x7FFFFFFF;
+		return positive % LinkedLists.Length;
+	}
+
 	public class LinkedList
 	{
 		private Node? Head { get; set; }
 
-		public void Insert(TKey key, TValue? value)
+		public bool IsEmpty {
+			get
+			{
+				return Head == null;
+			}
+		}
+
+		public bool Insert(TKey key, TValue? value)
 		{
 			var newNode = new Node(key, value);
 			if (Head == null)
@@ -39,7 +55,7 @@ public class Dictionary<TKey, TValue> where TKey : IEquatable<TKey>
 				{
 					if (pointer.Key.Equals(newNode.Key))
 					{
-						throw new InvalidOperationException("An entry with that key already exists.");
+						return false;
 					}
 					else
 					{
@@ -54,6 +70,7 @@ public class Dictionary<TKey, TValue> where TKey : IEquatable<TKey>
 					}
 				}
 			}
+			return true;
 		}
 
 		public bool GetByKey(TKey key, out TValue? value)
@@ -95,18 +112,18 @@ public class Dictionary<TKey, TValue> where TKey : IEquatable<TKey>
 				return false;
 			}
 		}
-	}
 
-	public class Node
-	{
-		public TKey Key { get; set; }
-		public TValue? Value { get; set; }
-		public Node? Next { get; set; }
-
-		public Node(TKey key, TValue? value)
+		private class Node
 		{
-			Key = key;
-			Value = value;
+			public TKey Key { get; set; }
+			public TValue? Value { get; set; }
+			public Node? Next { get; set; }
+
+			public Node(TKey key, TValue? value)
+			{
+				Key = key;
+				Value = value;
+			}
 		}
 	}
 }
