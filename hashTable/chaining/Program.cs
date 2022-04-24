@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 public class Program
 {
@@ -48,24 +49,37 @@ public class Program
 public class Dictionary<TKey, TValue> where TKey : IEquatable<TKey>
 {
 	private Node[] LinkedLists { get; set; }
+	private int Count;
 
 	public Dictionary(int initialCapacity = 10)
 	{
 		LinkedLists = new Node[initialCapacity];
+		Count = 0;
 	}
 
 	public bool Insert(TKey key, TValue value)
 	{
-		var index = GetIndex(key);
-		var newNode = new Node(key, value);
-		if (LinkedLists[index] == null)
+		RehashIfNecessary();
+		if (Insert(LinkedLists, key, value))
 		{
-			LinkedLists[index] = newNode;
+			Count++;
+			return true;
+		}
+		return false;
+	}
+
+	private bool Insert(Node[] linkedLists, TKey key, TValue value)
+	{
+		var index = GetIndex(linkedLists.Length, key);
+		var newNode = new Node(key, value);
+		if (linkedLists[index] == null)
+		{
+			linkedLists[index] = newNode;
 		}
 		else
 		{
 			// The list is not empty, iterate through to make sure the key does not already exist
-			Node pointer = LinkedLists[index];
+			Node pointer = linkedLists[index];
 			while (pointer != null)
 			{
 				if (pointer.Key.Equals(newNode.Key))
@@ -90,7 +104,7 @@ public class Dictionary<TKey, TValue> where TKey : IEquatable<TKey>
 
 	public bool GetByKey(TKey key, out TValue value)
 	{
-		var index = GetIndex(key);
+		var index = GetIndex(LinkedLists.Length, key);
 		Node pointer = LinkedLists[index];
 		while (pointer != null) {
 			if (pointer.Key.Equals(key)) {
@@ -106,7 +120,7 @@ public class Dictionary<TKey, TValue> where TKey : IEquatable<TKey>
 
 	public bool Remove(TKey key)
 	{
-		var index = GetIndex(key);
+		var index = GetIndex(LinkedLists.Length, key);
 		if (LinkedLists[index] == null) {
 			return false;
 		} else if (LinkedLists[index].Key.Equals(key)) {
@@ -130,11 +144,38 @@ public class Dictionary<TKey, TValue> where TKey : IEquatable<TKey>
 		}
 	}
 
-	private int GetIndex(TKey key)
+	private int GetIndex(int numberOfPositions, TKey key)
 	{
 		var hash = key.GetHashCode();
 		var positive = hash & 0x7FFFFFFF;
-		return positive % LinkedLists.Length;
+		return positive % numberOfPositions;
+	}
+
+	private void RehashIfNecessary()
+	{
+		if (LinkedLists.Length * 2 < Count)
+		{
+			var newLinkedLists = new Node[LinkedLists.Length * 4];
+			var enumerable = GetAsEnumerable();
+			foreach(var node in enumerable)
+			{
+				Insert(newLinkedLists, node.Key, node.Value);
+			}
+			LinkedLists = newLinkedLists;
+		}
+	}
+
+	private IEnumerable<Node> GetAsEnumerable()
+	{
+		foreach (var linkedList in LinkedLists)
+		{
+			Node pointer = linkedList;
+			while (pointer != null)
+			{
+				yield return pointer;
+				pointer = pointer.Next;
+			}
+		}
 	}
 
 	private class Node
