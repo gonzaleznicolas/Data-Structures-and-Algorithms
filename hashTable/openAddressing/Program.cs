@@ -32,6 +32,10 @@ public class Program
 		Console.WriteLine(d.Insert("Cata3", "Cata3"));
 		Console.WriteLine(d.Insert("Mama3", "Mama3"));
 		Console.WriteLine(d.Insert("Papa3", "Papa3"));
+        Console.WriteLine(d.GetByKey("Mama3", out var mama3));
+		Console.WriteLine(mama3);
+		Console.WriteLine(d.GetByKey("dx", out var dx));
+		Console.WriteLine(dx);
 	}
 }
 
@@ -94,6 +98,44 @@ public class Dictionary<TKey, TValue> where TKey : IEquatable<TKey>
         // if here, all the positions are either DEL or occupied
         return false;
     }
+
+    public bool GetByKey(TKey key, out TValue value)
+	{
+		if (key == null) {
+            value = default(TValue);
+            return false;
+        }
+        var attemptNumber = 0;
+        while (attemptNumber < Entries.Length)
+        {
+            var index = GetProbeIndex(key, attemptNumber, Entries.Length);
+            if (Entries[index].GetType() == typeof(Entry))
+            {
+                Entry entry = (Entry)Entries[index];
+                if (entry.Key.Equals(key))
+                {
+                    value = entry.Value;
+                    return true;
+                }
+                else
+                {
+                    attemptNumber++;
+                }
+            }
+            else if (Entries[index].GetType() == typeof(Del))
+            {
+                attemptNumber++;
+            }
+            else
+            {
+                // NIL
+                value = default(TValue);
+                return false;
+            }
+        }
+        value = default(TValue);
+        return false;
+	}
 
     private void RehashIfNecessary()
     {
