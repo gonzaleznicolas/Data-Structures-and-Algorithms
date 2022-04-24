@@ -2,8 +2,42 @@
 {
 	public static void Main(String[] args)
 	{
-		var ll = new Dictionary<string, string>();
-		Console.WriteLine(ll.Insert("1", "1"));
+		var d = new Dictionary<string, string>();
+		Console.WriteLine(d.Insert("1", "1"));
+		Console.WriteLine(d.Insert("dsa", "dsa"));
+		Console.WriteLine(d.Insert("Nico", "Nico"));
+		Console.WriteLine(d.Insert("Nata", "Nata"));
+		Console.WriteLine(d.Insert("Cata", "Cata"));
+		Console.WriteLine(d.Insert("Mama", "Mama"));
+		Console.WriteLine(d.Insert("Papa", "Papa"));
+		Console.WriteLine(d.Insert("Nico1", "Nico1"));
+		Console.WriteLine(d.Insert("Nata1", "Nata1"));
+		Console.WriteLine(d.Insert("Cata1", "Cata1"));
+		Console.WriteLine(d.Insert("Mama1", "Mama1"));
+		Console.WriteLine(d.Insert("Papa1", "Papa1"));
+		Console.WriteLine(d.Insert("Nico2", "Nico2"));
+		Console.WriteLine(d.Insert("Nata2", "Nata2"));
+		Console.WriteLine(d.Insert("Cata2", "Cata2"));
+		Console.WriteLine(d.Insert("Mama2", "Mama2"));
+		Console.WriteLine(d.Insert("Papa2", "Papa2"));
+		Console.WriteLine(d.Insert("Nico3", "Nico3"));
+		Console.WriteLine(d.Insert("Nata3", "Nata3"));
+		Console.WriteLine(d.Insert("Cata3", "Cata3"));
+		Console.WriteLine(d.Insert("Mama3", "Mama3"));
+		Console.WriteLine(d.Insert("Papa3", "Papa3"));
+		Console.WriteLine(d.Insert("Nico3", "Nico3"));
+		Console.WriteLine(d.Insert("Nata3", "Nata3"));
+		Console.WriteLine(d.Insert("Cata3", "Cata3"));
+		Console.WriteLine(d.Insert("Mama3", "Mama3"));
+		Console.WriteLine(d.Insert("Papa3", "Papa3"));
+
+		Console.WriteLine(d.GetByKey("Mama3", out var mama3));
+		Console.WriteLine(mama3);
+		Console.WriteLine(d.GetByKey("dx", out var dx));
+		Console.WriteLine(dx);
+
+		Console.WriteLine(d.Remove("Nico"));
+		Console.WriteLine(d.Remove("Nico7"));
 	}
 }
 
@@ -18,12 +52,26 @@ public class Dictionary<TKey, TValue> where TKey : IEquatable<TKey>
 		for (int i = 0; i < LinkedLists.Length; i++) LinkedLists[i] = new LinkedList();
 	}
 
-	public bool Insert(TKey key, TValue? value) {
+	public bool Insert(TKey key, TValue? value)
+	{
 		var ll = LinkedLists[KeyToIndex(key)];
 		return ll.Insert(key, value);
 	}
 
-	private int KeyToIndex(TKey key) {
+	public bool GetByKey(TKey key, out TValue? value)
+	{
+		var ll = LinkedLists[KeyToIndex(key)];
+		return ll.GetByKey(key, out value);
+	}
+
+	public bool Remove(TKey key)
+	{
+		var ll = LinkedLists[KeyToIndex(key)];
+		return ll.Remove(key);
+	}
+
+	private int KeyToIndex(TKey key)
+	{
 		var hash = key.GetHashCode();
 		var positive = hash & 0x7FFFFFFF;
 		return positive % LinkedLists.Length;
