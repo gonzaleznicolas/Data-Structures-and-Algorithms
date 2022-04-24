@@ -1,4 +1,6 @@
-﻿public class Program
+﻿using System;
+
+public class Program
 {
 	public static void Main(String[] args)
 	{
@@ -52,13 +54,13 @@ public class Dictionary<TKey, TValue> where TKey : IEquatable<TKey>
 		for (int i = 0; i < LinkedLists.Length; i++) LinkedLists[i] = new LinkedList();
 	}
 
-	public bool Insert(TKey key, TValue? value)
+	public bool Insert(TKey key, TValue value)
 	{
 		var ll = LinkedLists[KeyToIndex(key)];
 		return ll.Insert(key, value);
 	}
 
-	public bool GetByKey(TKey key, out TValue? value)
+	public bool GetByKey(TKey key, out TValue value)
 	{
 		var ll = LinkedLists[KeyToIndex(key)];
 		return ll.GetByKey(key, out value);
@@ -79,7 +81,7 @@ public class Dictionary<TKey, TValue> where TKey : IEquatable<TKey>
 
 	public class LinkedList
 	{
-		private Node? Head { get; set; }
+		private Node Head { get; set; }
 
 		public bool IsEmpty {
 			get
@@ -88,7 +90,7 @@ public class Dictionary<TKey, TValue> where TKey : IEquatable<TKey>
 			}
 		}
 
-		public bool Insert(TKey key, TValue? value)
+		public bool Insert(TKey key, TValue value)
 		{
 			var newNode = new Node(key, value);
 			if (Head == null)
@@ -98,7 +100,7 @@ public class Dictionary<TKey, TValue> where TKey : IEquatable<TKey>
 			else
 			{
 				// The list is not empty, iterate through to make sure the key does not already exist
-				Node? pointer = Head;
+				Node pointer = Head;
 				while (pointer != null)
 				{
 					if (pointer.Key.Equals(newNode.Key))
@@ -121,9 +123,9 @@ public class Dictionary<TKey, TValue> where TKey : IEquatable<TKey>
 			return true;
 		}
 
-		public bool GetByKey(TKey key, out TValue? value)
+		public bool GetByKey(TKey key, out TValue value)
 		{
-			Node? pointer = Head;
+			Node pointer = Head;
 			while (pointer != null) {
 				if (pointer.Key.Equals(key)) {
 					value = pointer.Value;
@@ -145,7 +147,7 @@ public class Dictionary<TKey, TValue> where TKey : IEquatable<TKey>
 				return true;
 			} else {
 				// The list is not empty and key is not at the head
-				Node? pointer = Head;
+				Node pointer = Head;
 				while (pointer.Next != null)
 				{
 					if (pointer.Next.Key.Equals(key))
@@ -164,10 +166,10 @@ public class Dictionary<TKey, TValue> where TKey : IEquatable<TKey>
 		private class Node
 		{
 			public TKey Key { get; set; }
-			public TValue? Value { get; set; }
-			public Node? Next { get; set; }
+			public TValue Value { get; set; }
+			public Node Next { get; set; }
 
-			public Node(TKey key, TValue? value)
+			public Node(TKey key, TValue value)
 			{
 				Key = key;
 				Value = value;
@@ -175,8 +177,3 @@ public class Dictionary<TKey, TValue> where TKey : IEquatable<TKey>
 		}
 	}
 }
-
-/*
-int hashCode = comparer.GetHashCode(key) & 0x7FFFFFFF;
-int targetBucket = hashCode % buckets.Length;
-*/
