@@ -5,7 +5,7 @@ public class Program
 	public static void Main(String[] args)
 	{
 		var d = new Dictionary<string, string>();
-        Console.WriteLine(d.Insert("1", "1"));
+		Console.WriteLine(d.Insert("1", "1"));
 		Console.WriteLine(d.Insert("dsa", "dsa"));
 		Console.WriteLine(d.Insert("Nico", "Nico"));
 		Console.WriteLine(d.Insert("Nata", "Nata"));
@@ -32,10 +32,15 @@ public class Program
 		Console.WriteLine(d.Insert("Cata3", "Cata3"));
 		Console.WriteLine(d.Insert("Mama3", "Mama3"));
 		Console.WriteLine(d.Insert("Papa3", "Papa3"));
-        Console.WriteLine(d.GetByKey("Mama3", out var mama3));
+
+		Console.WriteLine(d.GetByKey("Mama3", out var mama3));
 		Console.WriteLine(mama3);
 		Console.WriteLine(d.GetByKey("dx", out var dx));
 		Console.WriteLine(dx);
+
+		Console.WriteLine(d.Remove("Nico"));
+		Console.WriteLine(d.Remove("Nico"));
+		Console.WriteLine(d.Remove("Nico7"));
 	}
 }
 
@@ -134,6 +139,40 @@ public class Dictionary<TKey, TValue> where TKey : IEquatable<TKey>
             }
         }
         value = default(TValue);
+        return false;
+	}
+
+    public bool Remove(TKey key)
+	{
+		if (key == null) {
+            return false;
+        }
+        var attemptNumber = 0;
+        while (attemptNumber < Entries.Length)
+        {
+            var index = GetProbeIndex(key, attemptNumber, Entries.Length);
+            if (Entries[index].GetType() == typeof(Entry))
+            {
+                Entry entry = (Entry)Entries[index];
+                if (entry.Key.Equals(key))
+                {
+                    Entries[index] = new Del();
+                    return true;
+                }
+                else
+                {
+                    attemptNumber++;
+                }
+            }
+            else if (Entries[index].GetType() == typeof(Del))
+            {
+                attemptNumber++;
+            }
+            else
+            {
+                return false;
+            }
+        }
         return false;
 	}
 
