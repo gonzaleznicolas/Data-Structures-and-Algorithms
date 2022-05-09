@@ -12,9 +12,14 @@ class Program {
 		bst.Insert(new KeyType(30), "30");
 		bst.Insert(new KeyType(60), "60");
 		bst.Insert(new KeyType(80), "80");
+		bst.Insert(new KeyType(10), "10");
+		bst.Insert(new KeyType(33), "33");
+
+		bst.Delete(new KeyType(50));
+		bst.Delete(new KeyType(10));
+		bst.Delete(new KeyType(30));
 
 		Console.WriteLine(bst.Search(new KeyType(60)));
-		Console.WriteLine(bst.Search(new KeyType(50)));
 		try { bst.Search(new KeyType(22)); } catch { Console.WriteLine("As expected, throws exception on searching 22."); };
 	}
 }
@@ -26,6 +31,57 @@ public class BinarySearchTree<TKey, TValue> where TKey : IComparable<TKey>, IEqu
 	public BinarySearchTree() {
 		Root = null;
 		Count = 0;
+	}
+
+	public void Delete(TKey key) {
+		var node = SearchAsFarAsPossible(Root, key);
+
+		if (!node.Key.Equals(key)) throw new InvalidOperationException("Key not found.");
+
+		if (node.NumChildren == 0) {
+			RemoveNodeWithZeroChildren(node);
+		} else if (node.NumChildren == 1) {
+			RemoveNodeWithOneChild(node);
+		} else {
+			// node has 2 children
+			var minInRightSubtree = FindAndDeleteMinFromSubtree(node.Right);
+			node.Value = minInRightSubtree.Value;
+			node.Key = minInRightSubtree.Key;
+		}
+
+		Count--;
+	}
+
+	private void RemoveNodeWithZeroChildren(Node node) {
+		node.Parent.RemoveChild(node.Key);
+		node.Parent = null;
+	}
+
+	private void RemoveNodeWithOneChild(Node node) {
+		var onlyChild = node.OnlyChild;
+		node.Parent.ReplaceChildWithKey(node.Key, onlyChild);
+	}
+
+	// subtreeRoot must not be null and must have 2 non null children
+	private Node FindAndDeleteMinFromSubtree(Node subtreeRoot) {
+		var min = FindMinFromSubtree(subtreeRoot);
+		// min will definitely have 0 or 1 children
+		if (min.NumChildren == 0)
+			RemoveNodeWithZeroChildren(min);
+		else if (min.NumChildren == 1)
+			RemoveNodeWithOneChild(min);
+		return min;
+	}
+
+	// subtreeRoot must not be null
+	private Node FindMinFromSubtree(Node subtreeRoot) {
+		Node pointer = subtreeRoot;
+		while (true) {
+			if (pointer.Left != null)
+				pointer = pointer.Left;
+			else
+				return pointer;
+		}
 	}
 
 	public TValue Search(TKey key) {
@@ -102,6 +158,43 @@ public class BinarySearchTree<TKey, TValue> where TKey : IComparable<TKey>, IEqu
 		public Node Left { get; set; }
 
 		public Node Right { get; set; }
+
+		public int NumChildren {
+			get {
+				var count = 0;
+				if (Left != null) count++;
+				if (Right != null) count++;
+				return count;
+			}
+		}
+
+		public Node OnlyChild {
+			get {
+				if (NumChildren == 1) {
+					if (Left != null) return Left;
+					if (Right != null) return Right;
+				}
+				throw new InvalidOperationException("Cannot get OnlyChild of a node with 0 or 2 children.");
+			}
+		}
+
+		public void RemoveChild(TKey key) {
+			if (key.Equals(Left.Key)) Left = null;
+			else if (key.Equals(Right.Key)) Right = null;
+			else throw new InvalidOperationException("Provided key is not a child of this node.");
+		}
+
+		public void ReplaceChildWithKey(TKey keyOfChild, Node replacement) {
+			if (keyOfChild.Equals(Left.Key)) {
+				Left = replacement;
+				replacement.Parent = this;
+			}
+			else if (keyOfChild.Equals(Right.Key)) {
+				Right = replacement;
+				replacement.Parent = this;
+			}
+			else throw new InvalidOperationException("Provided key is not a child of this node.");
+		}
 	}
 }
 
