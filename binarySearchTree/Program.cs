@@ -2,7 +2,15 @@
 
 class Program {
 	static void Main(string[] args) {
-		Console.WriteLine(new KeyType(1).Equals(new KeyType(2)));
+		var bst = new BinarySearchTree<KeyType, string>();
+		Console.WriteLine(bst.Insert(new KeyType(50), "50"));
+		Console.WriteLine(bst.Insert(new KeyType(25), "25"));
+		Console.WriteLine(bst.Insert(new KeyType(75), "75"));
+		Console.WriteLine(bst.Insert(new KeyType(20), "20"));
+		Console.WriteLine(bst.Insert(new KeyType(20), "20"));
+		Console.WriteLine(bst.Insert(new KeyType(30), "30"));
+		Console.WriteLine(bst.Insert(new KeyType(60), "60"));
+		Console.WriteLine(bst.Insert(new KeyType(80), "80"));
 	}
 }
 
@@ -13,6 +21,33 @@ public class BinarySearchTree<TKey, TValue> where TKey : IComparable<TKey>, IEqu
 	public BinarySearchTree() {
 		Root = null;
 		Count = 0;
+	}
+
+	public bool Insert(TKey key, TValue value) {
+		var newNode = new Node { Key = key, Value = value };
+		if (Root == null) {
+			Root = newNode;
+			Count = 1;
+			return true;
+		}
+
+		var node = SearchAsFarAsPossible(Root, key);
+
+		if (node.Key.Equals(key)) {
+			// Key already exists
+			return false;
+		}
+
+		if (key.CompareTo(node.Key) < 0) {
+			node.Left = newNode;
+			newNode.Parent = node;
+		} else {
+			// key > node.Key
+			node.Right = newNode;
+			newNode.Parent = node;
+		}
+		Count++;
+		return true;
 	}
 
 	// Searches for key in tree rooted at subtreeRoot. subtreeRoot cannot be null.
@@ -26,28 +61,26 @@ public class BinarySearchTree<TKey, TValue> where TKey : IComparable<TKey>, IEqu
 			return subtreeRoot;
 		}
 
-		Node toReturn = null;
 		var pointer = subtreeRoot;
-		while (toReturn == null) {
+		while (true) {
 			if (key.CompareTo(pointer.Key) < 0) {
 				if (pointer.Left == null) {
-					toReturn = pointer;
+					return pointer;
 				} else if (pointer.Left.Key.Equals(key)) {
-					toReturn = pointer.Left;
+					return pointer.Left;
 				} else {
 					pointer = pointer.Left;
 				}
 			} else if (key.CompareTo(pointer.Key) > 0) {
 				if (pointer.Right == null) {
-					toReturn = pointer;
+					return pointer;
 				} else if (pointer.Right.Key.Equals(key)) {
-					toReturn = pointer.Right;
+					return pointer.Right;
 				} else {
 					pointer = pointer.Right;
 				}
 			}
 		}
-		return toReturn;
 	}
 
 	private class Node {
