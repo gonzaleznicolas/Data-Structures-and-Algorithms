@@ -3,14 +3,19 @@
 class Program {
 	static void Main(string[] args) {
 		var bst = new BinarySearchTree<KeyType, string>();
-		Console.WriteLine(bst.Insert(new KeyType(50), "50"));
-		Console.WriteLine(bst.Insert(new KeyType(25), "25"));
-		Console.WriteLine(bst.Insert(new KeyType(75), "75"));
-		Console.WriteLine(bst.Insert(new KeyType(20), "20"));
-		Console.WriteLine(bst.Insert(new KeyType(20), "20"));
-		Console.WriteLine(bst.Insert(new KeyType(30), "30"));
-		Console.WriteLine(bst.Insert(new KeyType(60), "60"));
-		Console.WriteLine(bst.Insert(new KeyType(80), "80"));
+		bst.Insert(new KeyType(50), "50");
+		bst.Insert(new KeyType(25), "25");
+		bst.Insert(new KeyType(75), "75");
+		bst.Insert(new KeyType(20), "20");
+
+		try { bst.Insert(new KeyType(20), "20"); } catch { Console.WriteLine("As expected, throws exception on inserting 20."); };
+		bst.Insert(new KeyType(30), "30");
+		bst.Insert(new KeyType(60), "60");
+		bst.Insert(new KeyType(80), "80");
+
+		Console.WriteLine(bst.Search(new KeyType(60)));
+		Console.WriteLine(bst.Search(new KeyType(50)));
+		try { bst.Search(new KeyType(22)); } catch { Console.WriteLine("As expected, throws exception on searching 22."); };
 	}
 }
 
@@ -23,19 +28,25 @@ public class BinarySearchTree<TKey, TValue> where TKey : IComparable<TKey>, IEqu
 		Count = 0;
 	}
 
-	public bool Insert(TKey key, TValue value) {
+	public TValue Search(TKey key) {
+		var node = SearchAsFarAsPossible(Root, key);
+		if (node.Key.Equals(key)) return node.Value;
+		throw new InvalidOperationException("Key not found.");
+	}
+
+	public void Insert(TKey key, TValue value) {
 		var newNode = new Node { Key = key, Value = value };
 		if (Root == null) {
 			Root = newNode;
 			Count = 1;
-			return true;
+			return;
 		}
 
 		var node = SearchAsFarAsPossible(Root, key);
 
 		if (node.Key.Equals(key)) {
 			// Key already exists
-			return false;
+			throw new InvalidOperationException("Key already exists");
 		}
 
 		if (key.CompareTo(node.Key) < 0) {
@@ -47,7 +58,6 @@ public class BinarySearchTree<TKey, TValue> where TKey : IComparable<TKey>, IEqu
 			newNode.Parent = node;
 		}
 		Count++;
-		return true;
 	}
 
 	// Searches for key in tree rooted at subtreeRoot. subtreeRoot cannot be null.
