@@ -20,8 +20,7 @@ class Program {
 		bst.Insert(new KeyType(650), "650");
 		bst.Insert(new KeyType(750), "750");
 		bst.Insert(new KeyType(850), "850");
-		bst.PrintInOrder();
-		Console.WriteLine();
+
 		foreach(var val in bst) {
 			Console.WriteLine(val);
 		}
@@ -43,26 +42,8 @@ public class BinarySearchTree<TKey, TValue>: IEnumerable<TValue> where TKey : IC
 
 	public IEnumerator<TValue> GetEnumerator()
     {
-        return InOrder(Root);
+        return Root.GetEnumerator();
     }
-
-	private IEnumerator<TValue> InOrder(Node node) {
-		if (node.Left != null) {
-			var leftEnumerator = InOrder(node.Left);
-			while(leftEnumerator.MoveNext()) {
-				var val = leftEnumerator.Current;
-				yield return val;
-			}
-		}
-		yield return node.Value;
-		if (node.Right != null) {
-			var rightEnumerator = InOrder(node.Right);
-			while(rightEnumerator.MoveNext()) {
-				var val = rightEnumerator.Current;
-				yield return val;
-			}
-		}
-	}
 
 	public void Delete(TKey key) {
 		var node = SearchAsFarAsPossible(Root, key);
@@ -180,7 +161,7 @@ public class BinarySearchTree<TKey, TValue>: IEnumerable<TValue> where TKey : IC
 		}
 	}
 
-	private class Node {
+	private class Node : IEnumerable<TValue> {
 		public TKey Key { get; set; }
 		public TValue Value { get; set; }
 
@@ -225,6 +206,25 @@ public class BinarySearchTree<TKey, TValue>: IEnumerable<TValue> where TKey : IC
 				replacement.Parent = this;
 			}
 			else throw new InvalidOperationException("Provided key is not a child of this node.");
+		}
+
+		IEnumerator IEnumerable.GetEnumerator() {
+			return GetEnumerator();
+		}
+
+		public IEnumerator<TValue> GetEnumerator()
+		{
+			if (Left != null) {
+				foreach (var val in Left)
+					yield return val;
+			}
+
+			yield return Value;
+
+			if (Right != null) {
+				foreach (var val in Right)
+					yield return val;
+			}
 		}
 	}
 }
