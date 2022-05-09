@@ -1,36 +1,67 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections;
 
 class Program {
 	static void Main(string[] args) {
 		var bst = new BinarySearchTree<KeyType, string>();
-		bst.Insert(new KeyType(50), "50");
-		bst.Insert(new KeyType(25), "25");
-		bst.Insert(new KeyType(75), "75");
-		bst.Insert(new KeyType(20), "20");
-
-		try { bst.Insert(new KeyType(20), "20"); } catch { Console.WriteLine("As expected, throws exception on inserting 20."); };
-		bst.Insert(new KeyType(30), "30");
-		bst.Insert(new KeyType(60), "60");
-		bst.Insert(new KeyType(80), "80");
-		bst.Insert(new KeyType(10), "10");
-		bst.Insert(new KeyType(33), "33");
-
-		bst.Delete(new KeyType(50));
-		bst.Delete(new KeyType(10));
-		bst.Delete(new KeyType(30));
-
-		Console.WriteLine(bst.Search(new KeyType(60)));
-		try { bst.Search(new KeyType(22)); } catch { Console.WriteLine("As expected, throws exception on searching 22."); };
+		bst.Insert(new KeyType(500), "500");
+		bst.Insert(new KeyType(300), "300");
+		bst.Insert(new KeyType(700), "700");
+		bst.Insert(new KeyType(200), "200");
+		bst.Insert(new KeyType(400), "400");
+		bst.Insert(new KeyType(600), "600");
+		bst.Insert(new KeyType(800), "800");
+		bst.Insert(new KeyType(150), "150");
+		bst.Insert(new KeyType(250), "250");
+		bst.Insert(new KeyType(350), "350");
+		bst.Insert(new KeyType(450), "450");
+		bst.Insert(new KeyType(550), "550");
+		bst.Insert(new KeyType(650), "650");
+		bst.Insert(new KeyType(750), "750");
+		bst.Insert(new KeyType(850), "850");
+		bst.PrintInOrder();
+		Console.WriteLine();
+		foreach(var val in bst) {
+			Console.WriteLine(val);
+		}
 	}
 }
 
-public class BinarySearchTree<TKey, TValue> where TKey : IComparable<TKey>, IEquatable<TKey> {
+public class BinarySearchTree<TKey, TValue>: IEnumerable<TValue> where TKey : IComparable<TKey>, IEquatable<TKey> {
 	private Node Root { get; set; }
 	private int Count { get; set; }
 
 	public BinarySearchTree() {
 		Root = null;
 		Count = 0;
+	}
+
+	IEnumerator IEnumerable.GetEnumerator() {
+		return GetEnumerator();
+	}
+
+	public IEnumerator<TValue> GetEnumerator()
+    {
+        return InOrder(Root);
+    }
+
+	private IEnumerator<TValue> InOrder(Node node) {
+		if (node.Left != null) {
+			var leftEnumerator = InOrder(node.Left);
+			while(leftEnumerator.MoveNext()) {
+				var val = leftEnumerator.Current;
+				yield return val;
+			}
+		}
+		yield return node.Value;
+		if (node.Right != null) {
+			var rightEnumerator = InOrder(node.Right);
+			while(rightEnumerator.MoveNext()) {
+				var val = rightEnumerator.Current;
+				yield return val;
+			}
+		}
 	}
 
 	public void Delete(TKey key) {
