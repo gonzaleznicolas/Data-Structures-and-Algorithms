@@ -24,6 +24,15 @@ class Program {
 		foreach(var val in bst) {
 			Console.WriteLine(val);
 		}
+
+		Console.WriteLine("\nPrint inorder recursive:");
+		bst.PrintValuesInOrderRecursive();
+
+		Console.WriteLine("\nPrint inorder iterative:");
+		bst.PrintValuesInOrderIterative();
+
+		Console.WriteLine("\nPrint BFS:");
+		bst.PrintValuesBfs();
 	}
 }
 
@@ -34,6 +43,46 @@ public class BinarySearchTree<TKey, TValue>: IEnumerable<TValue> where TKey : IC
 	public BinarySearchTree() {
 		Root = null;
 		Count = 0;
+	}
+
+	public void PrintValuesBfs() {
+		var queue = new Queue<Node>(Count);
+		queue.Enqueue(Root);
+		while (queue.Count > 0) {
+			var node = queue.Dequeue();
+			Console.WriteLine(node.Value);
+			if (node.Left != null) queue.Enqueue(node.Left);
+			if (node.Right != null) queue.Enqueue(node.Right);
+		}
+	}
+
+	public void PrintValuesInOrderIterative() {
+		var stack = new Stack<Node>(Count);
+		Node node = Root;
+
+		while (node != null || stack.Count > 0) {
+			if (node != null) {
+				stack.Push(node);
+				node = node.Left;
+			} else {
+				// node is null, so stack is non empty
+				var popped = stack.Pop();
+				Console.WriteLine(popped.Value);
+				node = popped.Right;
+			}
+		}
+	}
+
+	public void PrintValuesInOrderRecursive() {
+		PrintValuesInOrderRecursiveHelper(Root);
+	}
+
+	private void PrintValuesInOrderRecursiveHelper(Node node) {
+		if (node.Left != null)
+			PrintValuesInOrderRecursiveHelper(node.Left);
+		Console.WriteLine(node.Value);
+		if (node.Right != null)
+			PrintValuesInOrderRecursiveHelper(node.Right);
 	}
 
 	IEnumerator IEnumerable.GetEnumerator() {
