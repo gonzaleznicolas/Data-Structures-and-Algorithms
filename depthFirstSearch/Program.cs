@@ -25,6 +25,9 @@ public class Program
 		Console.WriteLine(graph.AddEdge("e", "f", 3));
 		Console.WriteLine(graph.AddEdge("e", "g", 1));
 		Console.WriteLine(graph.AddEdge("f", "g", 2));
+
+		foreach(var v in graph.Dfs("a"))
+			Console.WriteLine(v);
 	}
 }
 
@@ -42,8 +45,10 @@ public class UndirectedGraph<T> where T : IEquatable<T> {
 	// Returns true if start and end are vertices in the graph and the edge a-b did not already exist and was successfully added
 	// False otherwise.
 	public bool AddEdge(T a, T b, int weight = 1) {
-		if (!Vertices.TryGetValue(a, out var aAdjacencyDict)
-			|| !Vertices.TryGetValue(b, out var bAdjacencyDict)
+		Dictionary<T, int> aAdjacencyDict;
+		Dictionary<T, int> bAdjacencyDict;
+		if (!Vertices.TryGetValue(a, out aAdjacencyDict)
+			|| !Vertices.TryGetValue(b, out bAdjacencyDict)
 			|| aAdjacencyDict.ContainsKey(b)
 			|| bAdjacencyDict.ContainsKey(a)) {
 			return false;
@@ -52,5 +57,28 @@ public class UndirectedGraph<T> where T : IEquatable<T> {
 		aAdjacencyDict.Add(b, weight);
 		bAdjacencyDict.Add(a, weight);
 		return true;
+	}
+
+	public IEnumerable<T> Dfs(T startingVertex) {
+		if (!Vertices.ContainsKey(startingVertex)) {
+			throw new ArgumentException("The specified vertex does not exist.");
+		}
+
+		var visited = new HashSet<T>(Vertices.Count);
+		foreach(var t in DfsHelper(startingVertex, visited))
+			yield return t;
+	}
+
+	// assumes v exists
+	private IEnumerable<T> DfsHelper(T v, HashSet<T> visited) {
+		yield return v;
+		visited.Add(v);
+		var vAdjacencyDict = Vertices[v];
+		foreach(var kvp in vAdjacencyDict) {
+			if (!visited.Contains(kvp.Key)) {
+				foreach(var t in DfsHelper(kvp.Key, visited))
+					yield return t;
+			}
+		}
 	}
 }
