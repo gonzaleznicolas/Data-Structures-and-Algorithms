@@ -26,7 +26,14 @@ public class Program
 		Console.WriteLine(graph.AddEdge("e", "g", 1));
 		Console.WriteLine(graph.AddEdge("f", "g", 2));
 
+		Console.WriteLine();
+
 		foreach(var v in graph.Dfs("a"))
+			Console.WriteLine(v);
+		
+		Console.WriteLine();
+
+		foreach(var v in graph.Bfs("a"))
 			Console.WriteLine(v);
 	}
 }
@@ -65,19 +72,41 @@ public class UndirectedGraph<T> where T : IEquatable<T> {
 		}
 
 		var visited = new HashSet<T>(Vertices.Count);
-		foreach(var t in DfsHelper(startingVertex, visited))
-			yield return t;
+		foreach(var v in DfsHelper(startingVertex, visited))
+			yield return v;
 	}
 
 	// assumes v exists
-	private IEnumerable<T> DfsHelper(T v, HashSet<T> visited) {
-		yield return v;
-		visited.Add(v);
-		var vAdjacencyDict = Vertices[v];
+	private IEnumerable<T> DfsHelper(T vertex, HashSet<T> visited) {
+		yield return vertex;
+		visited.Add(vertex);
+		var vAdjacencyDict = Vertices[vertex];
 		foreach(var kvp in vAdjacencyDict) {
 			if (!visited.Contains(kvp.Key)) {
-				foreach(var t in DfsHelper(kvp.Key, visited))
-					yield return t;
+				foreach(var v in DfsHelper(kvp.Key, visited))
+					yield return v;
+			}
+		}
+	}
+
+	public IEnumerable<T> Bfs(T startingVertex) {
+		if (!Vertices.ContainsKey(startingVertex)) {
+			throw new ArgumentException("The specified vertex does not exist.");
+		}
+
+		var addedToQueue = new HashSet<T>(Vertices.Count);
+		var queue = new Queue<T>(Vertices.Count);
+		addedToQueue.Add(startingVertex);
+		queue.Enqueue(startingVertex);
+		while (queue.Count > 0) {
+			var vertex = queue.Dequeue();
+			yield return vertex;
+			var vertexAdjacencyList = Vertices[vertex];
+			foreach(var kvp in vertexAdjacencyList) {
+				if (!addedToQueue.Contains(kvp.Key)) {
+					addedToQueue.Add(kvp.Key);
+					queue.Enqueue(kvp.Key);
+				}
 			}
 		}
 	}
