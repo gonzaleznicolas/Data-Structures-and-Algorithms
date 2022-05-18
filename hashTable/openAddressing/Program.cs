@@ -33,9 +33,11 @@ public class Program
 		Console.WriteLine(d.Insert("Mama3", "Mama3"));
 		Console.WriteLine(d.Insert("Papa3", "Papa3"));
 
-		Console.WriteLine(d.GetByKey("Mama3", out var mama3));
+        string mama3;
+		Console.WriteLine(d.GetByKey("Mama3", out mama3));
 		Console.WriteLine(mama3);
-		Console.WriteLine(d.GetByKey("dx", out var dx));
+        string dx;
+		Console.WriteLine(d.GetByKey("dx", out dx));
 		Console.WriteLine(dx);
 
 		Console.WriteLine(d.Remove("Nico"));
