@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public class Program
 {
@@ -17,7 +18,7 @@ public class Program
 		Console.WriteLine(graph.AddVertex("i"));
 		Console.WriteLine(graph.AddEdge("a", "b", 5));
 		Console.WriteLine(graph.AddEdge("a", "c", 3));
-		Console.WriteLine(graph.AddEdge("a", "e", 1));
+		Console.WriteLine(graph.AddEdge("a", "e", 2));
 		Console.WriteLine(graph.AddEdge("b", "d", 2));
 		Console.WriteLine(graph.AddEdge("c", "b", 1));
 		Console.WriteLine(graph.AddEdge("c", "d", 1));
@@ -36,11 +37,49 @@ public class Program
 		Console.WriteLine(graph.AddEdge("h", "g", 2));
 
 		Console.WriteLine();
+
+		Dictionary<string, string> previous;
+		Dictionary<string, int> pathWeight;
+		DijkstrasAlgorithm<string>(graph, "a", out previous, out pathWeight);
+	}
+
+	public static void DijkstrasAlgorithm<T>(DirectedGraph<T> graph, T startVertex, out Dictionary<T, T> previous, out Dictionary<T, int> pathWeight) where T : IEquatable<T> {
+		previous = new Dictionary<T, T>(graph.Vertices.Count);
+		pathWeight = new Dictionary<T, int>(graph.Vertices.Count);
+		var priorityQueue = new PriorityQueue<int, T>(graph.Vertices.Count);
+		foreach(var vertex in graph.Vertices) {
+			previous.Add(vertex.Key, default(T));
+			if (vertex.Key.Equals(startVertex)) {
+				pathWeight.Add(vertex.Key, 0);
+				priorityQueue.Add(0, vertex.Key);
+			} else {
+				pathWeight.Add(vertex.Key, int.MaxValue);
+				priorityQueue.Add(int.MaxValue, vertex.Key);
+			}
+		}
+
+		while (priorityQueue.Count > 0) {
+			var current_priority_vertex = priorityQueue.RemoveMin();
+			var shortestPathToCurrentVertex = current_priority_vertex.Item1;
+			var currentVertex = current_priority_vertex.Item2;
+			var currentVertexAdjacencyList = graph.Vertices[currentVertex];
+			foreach(var outgoingEdge in currentVertexAdjacencyList) {
+				var neighbor = outgoingEdge.Key;
+				var edgeToNeighborWeight = outgoingEdge.Value;
+				var previouslyFoundShortestPathToNeighbor = pathWeight[neighbor];
+				var weightOfNewlyFoundPathToNeighbor = shortestPathToCurrentVertex + edgeToNeighborWeight;
+				if (weightOfNewlyFoundPathToNeighbor < previouslyFoundShortestPathToNeighbor) {
+					pathWeight[neighbor] = weightOfNewlyFoundPathToNeighbor;
+					previous[neighbor] = currentVertex;
+					priorityQueue.DecreasePriority(previouslyFoundShortestPathToNeighbor, neighbor, weightOfNewlyFoundPathToNeighbor);
+				}
+			}
+		}
 	}
 }
 
 public class DirectedGraph<T> where T : IEquatable<T> {
-	private Dictionary<T, Dictionary<T, int>> Vertices { get; set; }
+	public Dictionary<T, Dictionary<T, int>> Vertices { get; set; }
 
 	public DirectedGraph() {
 		Vertices = new Dictionary<T, Dictionary<T, int>>();
@@ -63,5 +102,37 @@ public class DirectedGraph<T> where T : IEquatable<T> {
 
 		aAdjacencyDict.Add(b, weight);
 		return true;
+	}
+}
+
+public class PriorityQueue<P, V> where P : IEquatable<P>, IComparable<P> {
+
+	private HashSet<Tuple<P, V>> Set { get; set; }
+
+	public int Count { get { return Set.Count; } }
+
+	public PriorityQueue(int capacity) {
+		Set = new HashSet<Tuple<P,V>>(capacity);
+	}
+
+	public bool Contains(P priority, V value) {
+		return Set.Contains(new Tuple<P, V>(priority, value));
+	}
+
+	public bool Add(P priority, V value) {
+		return Set.Add(new Tuple<P, V>(priority, value));
+	}
+
+	public Tuple<P,V> RemoveMin() {
+		var toRemove = Set.MinBy(t => t.Item1);
+		Set.Remove(toRemove);
+		return toRemove;
+	}
+
+	public bool DecreasePriority(P originalPriority, V value, P newPriority) {
+		if (!Set.Remove(new Tuple<P,V>(originalPriority, value))) {
+			return false;
+		}
+		return Set.Add(new Tuple<P,V>(newPriority, value));
 	}
 }
