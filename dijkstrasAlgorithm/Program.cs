@@ -46,22 +46,22 @@ public class Program
 	public static void DijkstrasAlgorithm<T>(DirectedGraph<T> graph, T startVertex, out Dictionary<T, T> previous, out Dictionary<T, int> pathWeight) where T : IEquatable<T> {
 		previous = new Dictionary<T, T>(graph.Vertices.Count);
 		pathWeight = new Dictionary<T, int>(graph.Vertices.Count);
-		var priorityQueue = new PriorityQueue<int, T>(graph.Vertices.Count);
+		var priorityQueue = new PriorityQueue<T, int>(graph.Vertices.Count);
 		foreach(var vertex in graph.Vertices) {
 			previous.Add(vertex.Key, default(T));
 			if (vertex.Key.Equals(startVertex)) {
 				pathWeight.Add(vertex.Key, 0);
-				priorityQueue.Add(0, vertex.Key);
+				priorityQueue.Add(vertex.Key, 0);
 			} else {
 				pathWeight.Add(vertex.Key, int.MaxValue);
-				priorityQueue.Add(int.MaxValue, vertex.Key);
+				priorityQueue.Add(vertex.Key, int.MaxValue);
 			}
 		}
 
 		while (priorityQueue.Count > 0) {
-			var current_priority_vertex = priorityQueue.RemoveMin();
-			var shortestPathToCurrentVertex = current_priority_vertex.Item1;
-			var currentVertex = current_priority_vertex.Item2;
+			T currentVertex;
+			int shortestPathToCurrentVertex;
+			priorityQueue.RemoveMin(out currentVertex, out shortestPathToCurrentVertex);
 			var currentVertexAdjacencyList = graph.Vertices[currentVertex];
 			foreach(var outgoingEdge in currentVertexAdjacencyList) {
 				var neighbor = outgoingEdge.Key;
@@ -71,7 +71,7 @@ public class Program
 				if (weightOfNewlyFoundPathToNeighbor < previouslyFoundShortestPathToNeighbor) {
 					pathWeight[neighbor] = weightOfNewlyFoundPathToNeighbor;
 					previous[neighbor] = currentVertex;
-					priorityQueue.DecreasePriority(previouslyFoundShortestPathToNeighbor, neighbor, weightOfNewlyFoundPathToNeighbor);
+					priorityQueue.DecreasePriority(neighbor, weightOfNewlyFoundPathToNeighbor);
 				}
 			}
 		}
@@ -105,28 +105,28 @@ public class DirectedGraph<T> where T : IEquatable<T> {
 	}
 }
 
-public class PriorityQueue<P, V> where P : IEquatable<P>, IComparable<P> where V : IEquatable<V> {
+public class PriorityQueue<V, P> where V : IEquatable<V> where P : IEquatable<P>, IComparable<P> {
 
-	private List<Tuple<P, V>> List { get; set; }
+	private Dictionary<V, P> Dictionary { get; set; }
 
-	public int Count { get { return List.Count; } }
+	public int Count { get { return Dictionary.Count; } }
 
 	public PriorityQueue(int capacity) {
-		List = new List<Tuple<P,V>>(capacity);
+		Dictionary = new Dictionary<V, P>(capacity);
 	}
 
-	public void Add(P priority, V value) {
-		List.Insert(List.Count, new Tuple<P, V>(priority, value));
+	public void Add(V vertex, P priority) {
+		Dictionary.Add(vertex, priority);
 	}
 
-	public Tuple<P,V> RemoveMin() {
-		var toRemove = List.MinBy(t => t.Item1);
-		List.Remove(toRemove);
-		return toRemove;
+	public void RemoveMin(out V vertex, out P priority) {
+		var kvp = Dictionary.MinBy(o => o.Value);
+		vertex = kvp.Key;
+		priority = kvp.Value;
+		Dictionary.Remove(vertex);
 	}
 
-	public void DecreasePriority(P originalPriority, V value, P newPriority) {
-		var index = List.FindIndex(t => t.Item1.Equals(originalPriority) && t.Item2.Equals(value));
-		List[index] = new Tuple<P,V>(newPriority, value);
+	public void DecreasePriority(V vertex, P newPriority) {
+		Dictionary[vertex] = newPriority;
 	}
 }
