@@ -105,34 +105,28 @@ public class DirectedGraph<T> where T : IEquatable<T> {
 	}
 }
 
-public class PriorityQueue<P, V> where P : IEquatable<P>, IComparable<P> {
+public class PriorityQueue<P, V> where P : IEquatable<P>, IComparable<P> where V : IEquatable<V> {
 
-	private HashSet<Tuple<P, V>> Set { get; set; }
+	private List<Tuple<P, V>> List { get; set; }
 
-	public int Count { get { return Set.Count; } }
+	public int Count { get { return List.Count; } }
 
 	public PriorityQueue(int capacity) {
-		Set = new HashSet<Tuple<P,V>>(capacity);
+		List = new List<Tuple<P,V>>(capacity);
 	}
 
-	public bool Contains(P priority, V value) {
-		return Set.Contains(new Tuple<P, V>(priority, value));
-	}
-
-	public bool Add(P priority, V value) {
-		return Set.Add(new Tuple<P, V>(priority, value));
+	public void Add(P priority, V value) {
+		List.Insert(List.Count, new Tuple<P, V>(priority, value));
 	}
 
 	public Tuple<P,V> RemoveMin() {
-		var toRemove = Set.MinBy(t => t.Item1);
-		Set.Remove(toRemove);
+		var toRemove = List.MinBy(t => t.Item1);
+		List.Remove(toRemove);
 		return toRemove;
 	}
 
-	public bool DecreasePriority(P originalPriority, V value, P newPriority) {
-		if (!Set.Remove(new Tuple<P,V>(originalPriority, value))) {
-			return false;
-		}
-		return Set.Add(new Tuple<P,V>(newPriority, value));
+	public void DecreasePriority(P originalPriority, V value, P newPriority) {
+		var index = List.FindIndex(t => t.Item1.Equals(originalPriority) && t.Item2.Equals(value));
+		List[index] = new Tuple<P,V>(newPriority, value);
 	}
 }
